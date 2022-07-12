@@ -24,4 +24,19 @@ describe("Greeter", () => {
     await greeter.setGreeting(expected);
     expect(await greeter.greet()).to.equal(expected);
   });
+
+  describe("owner()", () => {
+    it("returns the address of the owner", async () => {
+      const Greeter = await ethers.getContractFactory("Greeter");
+      const greeter = await Greeter.deploy();
+      const owner = await greeter.owner();
+      assert(owner, "the current owner");
+    });
+    it("matches the address of the originally deployed the contract", async () => {
+      const Greeter = await ethers.getContractFactory("Greeter");
+      const greeter = await Greeter.deploy();
+      const [owner] = await ethers.getSigners();
+      expect(await greeter.owner()).to.equal(owner.address);
+    });
+  });
 });
