@@ -29,16 +29,17 @@ describe("Greeter", () => {
       const Greeter = await ethers.getContractFactory("Greeter");
       const greeter = await Greeter.deploy();
       const [_, otherAccount] = await ethers.getSigners();
-      greeter.connect(otherAccount);
-      const expected = "Hi there!";
-      try {
-        await greeter.setGreeting(expected);
-      } catch (err) {
-        const errorMessage = "Ownable: caller is not the owner";
-        expect((err as any).reason).to.equal(errorMessage);
-        return;
-      }
-      expect(await greeter.greet()).to.not.equal(expected);
+      await expect(
+        greeter.connect(otherAccount).setGreeting("Hi there!")
+      ).to.be.revertedWith("Ownable: caller is not the owner");
+      // try {
+      //   await greeter.connect(otherAccount).setGreeting("Hi there!");
+      // } catch (err) {
+      //   const errorMessage = "Ownable: caller is not the owner";
+      //   expect((err as any).reason).to.equal(errorMessage);
+      //   return;
+      // }
+      // assert(false, "greeting should not update");
     });
   });
 
