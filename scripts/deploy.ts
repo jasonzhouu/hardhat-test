@@ -1,6 +1,13 @@
 import { ethers } from "hardhat";
 
-async function main() {
+async function deployGreeter() {
+  const Greeter = await ethers.getContractFactory("Greeter");
+  const greeter = await Greeter.deploy();
+  await greeter.deployed();
+  console.log("Greeter is deployed to", greeter.address);
+}
+
+async function deployLock() {
   const currentTimestampInSeconds = Math.round(Date.now() / 1000);
   const ONE_YEAR_IN_SECS = 365 * 24 * 60 * 60;
   const unlockTime = currentTimestampInSeconds + ONE_YEAR_IN_SECS;
@@ -13,6 +20,10 @@ async function main() {
   await lock.deployed();
 
   console.log("Lock with 1 ETH deployed to:", lock.address);
+}
+
+async function main() {
+  return Promise.all([deployGreeter(), deployLock()]);
 }
 
 // We recommend this pattern to be able to use async/await everywhere
