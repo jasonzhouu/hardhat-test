@@ -14,6 +14,14 @@ describe("Greeter", () => {
   it("return hello world", async () => {
     const Greeter = await ethers.getContractFactory("Greeter");
     const greeter = await Greeter.deploy();
-    expect(await greeter.greet()).to.equal("Hello, World!");
+    const expected = "Hello, World!";
+    expect(await greeter.greet()).to.equal(expected);
+  });
+  it("set greeting to passed in string", async () => {
+    const Greeter = await ethers.getContractFactory("Greeter");
+    const greeter = await Greeter.deploy();
+    const expected = "Hi there!";
+    await greeter.setGreeting(expected);
+    expect(await greeter.greet()).to.equal(expected);
   });
 });
