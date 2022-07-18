@@ -1,13 +1,13 @@
 import { ethers } from "hardhat";
 import { ethers as ethers_ } from "ethers";
-import { assert } from "chai";
+import { assert, expect } from "chai";
 
 describe("FundRaiser", () => {
-  let fundraiser: ethers_.ContractFactory;
-  beforeEach(async () => {
-    fundraiser = await ethers.getContractFactory("Fundraiser");
-  });
   it("get contract", async () => {
+    const Fundraiser = await ethers.getContractFactory("Fundraiser");
+    const fundraiser = await Fundraiser.deploy("Jason", "");
     assert(fundraiser, "contract was not found");
+    const actual = await fundraiser.name();
+    expect(actual).to.equal("Jason");
   });
 });
