@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.6.6;
+pragma solidity ^0.8.0;
 
 /// @title SimpleBank
 /// @author Jason Zhou
@@ -7,12 +7,12 @@ pragma solidity ^0.6.6;
 contract SimpleBank {
     mapping(address => uint) private balances;
 
-    address public owner;
+    address payable public owner;
 
     event LogDepositMade(address accountAddress, uint amount);
 
-    constructor() public {
-        owner = msg.sender;
+    constructor() {
+        owner = payable(msg.sender);
     }
 
     /// @notice deposit ether into bank
@@ -39,7 +39,7 @@ contract SimpleBank {
     {
         require(withdrawAmount <= balances[msg.sender]);
         balances[msg.sender] -= withdrawAmount;
-        msg.sender.transfer(withdrawAmount);
+        payable(msg.sender).transfer(withdrawAmount);
         return balances[msg.sender];
     }
 

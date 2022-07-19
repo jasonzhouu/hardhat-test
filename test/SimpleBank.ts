@@ -14,4 +14,11 @@ describe("SimpleBank", () => {
     const [owner] = await ethers.getSigners();
     expect(actual).to.equal(owner.address);
   });
+  it("deposit", async () => {
+    await simpleBank.deposit({ value: 1 });
+    expect(await simpleBank.balance()).to.equal(1);
+  });
+  it("withdraw", async () => {
+    await expect(simpleBank.withdraw(1)).to.be.revertedWithoutReason();
+  });
 });
