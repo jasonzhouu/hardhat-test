@@ -6,6 +6,7 @@ pragma solidity ^0.8.0;
 
 contract SimpleBank {
     mapping(address => uint) private balances;
+    mapping(address => uint) public balances_;
 
     address payable public owner;
 

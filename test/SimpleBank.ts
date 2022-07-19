@@ -37,4 +37,8 @@ describe("SimpleBank", () => {
       await expect(simpleBank.withdraw(11)).to.be.revertedWithoutReason();
     });
   });
+  it("balances_", async () => {
+    const [owner] = await ethers.getSigners();
+    expect(await simpleBank.balances_(owner.address)).to.equal(0);
+  });
 });
