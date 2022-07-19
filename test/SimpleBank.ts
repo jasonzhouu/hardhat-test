@@ -18,7 +18,23 @@ describe("SimpleBank", () => {
     await simpleBank.deposit({ value: 1 });
     expect(await simpleBank.balance()).to.equal(1);
   });
-  it("withdraw", async () => {
-    await expect(simpleBank.withdraw(1)).to.be.revertedWithoutReason();
+  describe("withdraw", () => {
+    it("withdraw without deposit", async () => {
+      await expect(simpleBank.withdraw(1)).to.be.revertedWithoutReason();
+    });
+    it("width after deposit", async () => {
+      await simpleBank.deposit({ value: 10 });
+      await simpleBank.withdraw(1);
+      expect(await simpleBank.balance()).to.equal(9);
+    });
+    it("withdraw all balance", async () => {
+      await simpleBank.deposit({ value: 10 });
+      await simpleBank.withdraw(10);
+      expect(await simpleBank.balance()).to.equal(0);
+    });
+    it("withdraw more money than balance", async () => {
+      await simpleBank.deposit({ value: 10 });
+      await expect(simpleBank.withdraw(11)).to.be.revertedWithoutReason();
+    });
   });
 });
