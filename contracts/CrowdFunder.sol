@@ -102,7 +102,7 @@ contract CrowdFunder {
         return true;
     }
 
-    function remoteContract() public isCreator atEndOfLifecycle {
+    function removeContract() public isCreator atEndOfLifecycle {
         selfdestruct(payable(msg.sender));
     }
 }
