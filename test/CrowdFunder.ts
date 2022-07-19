@@ -1,6 +1,7 @@
 import { ethers } from "hardhat";
 import { ethers as ethers_ } from "ethers";
 import { assert, expect } from "chai";
+import { time } from "@nomicfoundation/hardhat-network-helpers";
 
 describe("CrowdFunder", () => {
   let crowdFunder: ethers_.Contract;
@@ -61,6 +62,20 @@ describe("CrowdFunder", () => {
       expect(await crowdFunder.state()).to.equal(0);
       await crowdFunderWithAnotherAccount.contribute({ value: 100 });
       expect(await crowdFunder.state()).to.equal(2);
+      await expect(
+        crowdFunderWithAnotherAccount.contribute({ value: 1 })
+      ).to.revertedWithoutReason();
+    });
+    it("contribute after expired", async () => {
+      const [_, anotherAccount] = await ethers.getSigners();
+      const crowdFunderWithAnotherAccount = await crowdFunder.connect(
+        anotherAccount
+      );
+      const latestTime = await time.latest();
+      const ONE_YEAR_IN_SECS = 365 * 24 * 60 * 60;
+      await time.increaseTo(latestTime + ONE_YEAR_IN_SECS);
+      await crowdFunder.checkIfFundingCompleteOrExpired();
+      expect(await crowdFunder.state()).to.equal(1);
       await expect(
         crowdFunderWithAnotherAccount.contribute({ value: 1 })
       ).to.revertedWithoutReason();
