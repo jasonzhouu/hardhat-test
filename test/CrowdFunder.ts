@@ -80,5 +80,18 @@ describe("CrowdFunder", () => {
         crowdFunderWithAnotherAccount.contribute({ value: 1 })
       ).to.revertedWithoutReason();
     });
+    it("refund after expired", async () => {
+      const [_, anotherAccount] = await ethers.getSigners();
+      const crowdFunderWithAnotherAccount = await crowdFunder.connect(
+        anotherAccount
+      );
+      await crowdFunderWithAnotherAccount.contribute({ value: 1 });
+      const latestTime = await time.latest();
+      const ONE_YEAR_IN_SECS = 365 * 24 * 60 * 60;
+      await time.increaseTo(latestTime + ONE_YEAR_IN_SECS);
+      await crowdFunder.checkIfFundingCompleteOrExpired();
+      expect(await crowdFunder.state()).to.equal(1);
+      await crowdFunderWithAnotherAccount.getRefund(0);
+    });
   });
 });
