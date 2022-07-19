@@ -33,11 +33,8 @@ contract SimpleBank {
     /// @notice withdraw ether from bank
     /// @dev this does not send any excess ether to it
     /// @param withdrawAmount amount you want to withdraw
-    /// @return remainingBalance
-    function withdraw(uint withdrawAmount)
-        public
-        returns (uint remainingBalance)
-    {
+    /// @return remaining balance
+    function withdraw(uint withdrawAmount) public returns (uint) {
         require(withdrawAmount <= balances[msg.sender]);
         balances[msg.sender] -= withdrawAmount;
         payable(msg.sender).transfer(withdrawAmount);
