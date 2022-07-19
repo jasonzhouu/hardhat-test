@@ -7,7 +7,7 @@ contract CrowdFunder {
     address public creator;
     address payable public fundRecipient;
     uint public miniumToRaise;
-    string compaignUrl;
+    string campaignUrl;
     enum State {
         FundRaising,
         ExpireRefund,
@@ -44,13 +44,13 @@ contract CrowdFunder {
 
     function crowdFund(
         uint timeInHoursForFundraising,
-        string memory _compaignUrl,
+        string memory _campaignUrl,
         address payable _fundRecipient,
         uint _minimumToRaise
     ) public {
         creator = msg.sender;
         fundRecipient = _fundRecipient;
-        compaignUrl = _compaignUrl;
+        campaignUrl = _campaignUrl;
         miniumToRaise = _minimumToRaise;
         raiseBy = block.timestamp + (timeInHoursForFundraising * 1 hours);
     }

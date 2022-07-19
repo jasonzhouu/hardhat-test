@@ -15,4 +15,17 @@ describe("CrowdFunder", () => {
     expect(actual).to.not.equal(owner.address);
     expect(actual).to.equal("0x0000000000000000000000000000000000000000");
   });
+  it("init state", async () => {
+    const [owner, anotherAccount] = await ethers.getSigners();
+    await crowdFunder.crowdFund(
+      24 * 7,
+      "https://www.google.com",
+      anotherAccount.address,
+      100
+    );
+    expect(await crowdFunder.creator()).to.equal(owner.address);
+    expect(await crowdFunder.fundRecipient()).to.equal(anotherAccount.address);
+    expect(await crowdFunder.miniumToRaise()).to.equal(100);
+    expect(await crowdFunder.raiseBy()).to.not.equal(0);
+  });
 });
