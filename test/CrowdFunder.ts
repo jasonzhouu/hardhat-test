@@ -5,9 +5,12 @@ import { time } from "@nomicfoundation/hardhat-network-helpers";
 
 describe("CrowdFunder", () => {
   let crowdFunder: ethers_.Contract;
+  let crowdFunderWithAnotherAccount: ethers_.Contract;
   beforeEach(async () => {
     const CrowdFunder = await ethers.getContractFactory("CrowdFunder");
     crowdFunder = await CrowdFunder.deploy();
+    const [_, anotherAccount] = await ethers.getSigners();
+    crowdFunderWithAnotherAccount = crowdFunder.connect(anotherAccount);
   });
   it("get initial state", async () => {
     assert(crowdFunder, "contract was not found");
@@ -28,7 +31,7 @@ describe("CrowdFunder", () => {
       );
     });
     it("init state", async () => {
-      const [owner, anotherAccount, recipient] = await ethers.getSigners();
+      const [owner, _, recipient] = await ethers.getSigners();
       expect(await crowdFunder.creator()).to.equal(owner.address);
       expect(await crowdFunder.fundRecipient()).to.equal(recipient.address);
       expect(await crowdFunder.miniumToRaise()).to.equal(100);
@@ -38,8 +41,7 @@ describe("CrowdFunder", () => {
       expect(await crowdFunder.totalRaised()).to.equal(0);
     });
     it("raise succesfully", async () => {
-      const [owner, anotherAccount] = await ethers.getSigners();
-      const crowdFunderWithAnotherAccount = crowdFunder.connect(anotherAccount);
+      const [_, anotherAccount] = await ethers.getSigners();
       await expect(crowdFunderWithAnotherAccount.contribute({ value: 1 }))
         .to.emit(crowdFunder, "LogFundingReceived")
         .withArgs(anotherAccount.address, 1, 1);
@@ -52,10 +54,6 @@ describe("CrowdFunder", () => {
       expect(await crowdFunder.state()).to.equal(2);
     });
     it("contribute after success", async () => {
-      const [_, anotherAccount] = await ethers.getSigners();
-      const crowdFunderWithAnotherAccount = await crowdFunder.connect(
-        anotherAccount
-      );
       await crowdFunderWithAnotherAccount.contribute({ value: 1 });
       expect(await crowdFunder.state()).to.equal(0);
       await crowdFunderWithAnotherAccount.contribute({ value: 100 });
@@ -65,23 +63,16 @@ describe("CrowdFunder", () => {
       ).to.revertedWithoutReason();
     });
     it("payout after success", async () => {
-      const [_, anotherAccount, recipient] = await ethers.getSigners();
-      const crowdFunderWithAnotherAccount = await crowdFunder.connect(
-        anotherAccount
-      );
+      const accounts = await ethers.getSigners();
       await crowdFunderWithAnotherAccount.contribute({ value: 1 });
       expect(await crowdFunder.state()).to.equal(0);
       await crowdFunderWithAnotherAccount.contribute({ value: 100 });
       expect(await crowdFunder.state()).to.equal(2);
       await expect(crowdFunder.payout())
         .to.emit(crowdFunder, "LogWinnerPaid")
-        .withArgs(recipient.address);
+        .withArgs(accounts[2].address);
     });
     it("contribute after expired", async () => {
-      const [_, anotherAccount] = await ethers.getSigners();
-      const crowdFunderWithAnotherAccount = await crowdFunder.connect(
-        anotherAccount
-      );
       const latestTime = await time.latest();
       const ONE_YEAR_IN_SECS = 365 * 24 * 60 * 60;
       await time.increaseTo(latestTime + ONE_YEAR_IN_SECS);
@@ -92,10 +83,6 @@ describe("CrowdFunder", () => {
       ).to.revertedWithoutReason();
     });
     it("refund after expired", async () => {
-      const [_, anotherAccount] = await ethers.getSigners();
-      const crowdFunderWithAnotherAccount = await crowdFunder.connect(
-        anotherAccount
-      );
       await crowdFunderWithAnotherAccount.contribute({ value: 1 });
       const latestTime = await time.latest();
       const ONE_YEAR_IN_SECS = 365 * 24 * 60 * 60;
