@@ -36,22 +36,33 @@ describe("CrowdFunder", () => {
       const now = Math.floor(Date.now() / 1000);
       expect((await crowdFunder.raiseBy()).toNumber()).to.greaterThan(now);
       expect(await crowdFunder.state()).to.equal(0);
+      expect(await crowdFunder.totalRaised()).to.equal(0);
     });
-    it("rainse succesfully", async () => {
-      const [_, anotherAccount] = await ethers.getSigners();
-      await crowdFunder.connect(anotherAccount).contribute({ value: 1 });
+    it("raise succesfully", async () => {
+      const [owner, anotherAccount] = await ethers.getSigners();
+      const crowdFunderWithAnotherAccount = crowdFunder.connect(anotherAccount);
+      await expect(crowdFunderWithAnotherAccount.contribute({ value: 1 }))
+        .to.emit(crowdFunder, "LogFundingReceived")
+        .withArgs(anotherAccount.address, 1, 1);
+      expect(await crowdFunder.totalRaised()).to.equal(1);
       expect(await crowdFunder.state()).to.equal(0);
-      await crowdFunder.connect(anotherAccount).contribute({ value: 100 });
+      await expect(crowdFunderWithAnotherAccount.contribute({ value: 100 }))
+        .to.emit(crowdFunder, "LogFundingReceived")
+        .withArgs(anotherAccount.address, 100, 101);
+      expect(await crowdFunder.totalRaised()).to.equal(101);
       expect(await crowdFunder.state()).to.equal(2);
     });
     it("contribute after success", async () => {
       const [_, anotherAccount] = await ethers.getSigners();
-      await crowdFunder.connect(anotherAccount).contribute({ value: 1 });
+      const crowdFunderWithAnotherAccount = await crowdFunder.connect(
+        anotherAccount
+      );
+      await crowdFunderWithAnotherAccount.contribute({ value: 1 });
       expect(await crowdFunder.state()).to.equal(0);
-      await crowdFunder.connect(anotherAccount).contribute({ value: 100 });
+      await crowdFunderWithAnotherAccount.contribute({ value: 100 });
       expect(await crowdFunder.state()).to.equal(2);
       await expect(
-        crowdFunder.connect(anotherAccount).contribute({ value: 1 })
+        crowdFunderWithAnotherAccount.contribute({ value: 1 })
       ).to.revertedWithoutReason();
     });
   });
