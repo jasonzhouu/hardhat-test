@@ -19,20 +19,18 @@ describe("CrowdFunder", () => {
   });
   describe("start a new crowd fund raise", () => {
     beforeEach(async () => {
-      const [owner, anotherAccount] = await ethers.getSigners();
+      const accounts = await ethers.getSigners();
       await crowdFunder.crowdFund(
         24 * 7,
         "https://www.google.com",
-        anotherAccount.address,
+        accounts[2].address,
         100
       );
     });
     it("init state", async () => {
-      const [owner, anotherAccount] = await ethers.getSigners();
+      const [owner, anotherAccount, recipient] = await ethers.getSigners();
       expect(await crowdFunder.creator()).to.equal(owner.address);
-      expect(await crowdFunder.fundRecipient()).to.equal(
-        anotherAccount.address
-      );
+      expect(await crowdFunder.fundRecipient()).to.equal(recipient.address);
       expect(await crowdFunder.miniumToRaise()).to.equal(100);
       const now = Math.floor(Date.now() / 1000);
       expect((await crowdFunder.raiseBy()).toNumber()).to.greaterThan(now);
@@ -65,6 +63,19 @@ describe("CrowdFunder", () => {
       await expect(
         crowdFunderWithAnotherAccount.contribute({ value: 1 })
       ).to.revertedWithoutReason();
+    });
+    it("payout after success", async () => {
+      const [_, anotherAccount, recipient] = await ethers.getSigners();
+      const crowdFunderWithAnotherAccount = await crowdFunder.connect(
+        anotherAccount
+      );
+      await crowdFunderWithAnotherAccount.contribute({ value: 1 });
+      expect(await crowdFunder.state()).to.equal(0);
+      await crowdFunderWithAnotherAccount.contribute({ value: 100 });
+      expect(await crowdFunder.state()).to.equal(2);
+      await expect(crowdFunder.payout())
+        .to.emit(crowdFunder, "LogWinnerPaid")
+        .withArgs(recipient.address);
     });
     it("contribute after expired", async () => {
       const [_, anotherAccount] = await ethers.getSigners();
