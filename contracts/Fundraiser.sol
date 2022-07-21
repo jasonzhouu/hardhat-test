@@ -15,6 +15,7 @@ contract Fundraiser is Ownable {
     struct Donation {
         address contributor;
         uint amount;
+        uint date;
     }
 
     event LogNewDonation(address contributor, uint amount);
@@ -40,7 +41,13 @@ contract Fundraiser is Ownable {
     }
 
     function donate() public payable returns (bool) {
-        donations.push(Donation({amount: msg.value, contributor: msg.sender}));
+        donations.push(
+            Donation({
+                amount: msg.value,
+                contributor: msg.sender,
+                date: block.timestamp
+            })
+        );
         beneficiary.transfer(msg.value);
         emit LogNewDonation(msg.sender, msg.value);
         return true;
