@@ -12,7 +12,7 @@ describe("FundRaiser", async () => {
     const imageURL = "https://placekitten.com/600/350";
     const description = "Beneficiary description";
     const beneficiary = accounts[1].address;
-    const custodian = accounts[0].address;
+    const owner = accounts[0].address;
     const Fundraiser = await ethers.getContractFactory("Fundraiser");
     fundraiser = await Fundraiser.deploy(
       name,
@@ -20,7 +20,7 @@ describe("FundRaiser", async () => {
       imageURL,
       description,
       beneficiary,
-      custodian
+      owner
     );
     return {
       name,
@@ -28,27 +28,20 @@ describe("FundRaiser", async () => {
       imageURL,
       description,
       beneficiary,
-      custodian,
+      owner,
       fundraiser,
     };
   }
 
   it("get contract", async () => {
-    const {
-      name,
-      url,
-      imageURL,
-      description,
-      beneficiary,
-      custodian,
-      fundraiser,
-    } = await loadFixture(deployFixture);
+    const { name, url, imageURL, description, beneficiary, owner, fundraiser } =
+      await loadFixture(deployFixture);
     assert(fundraiser, "contract was not found");
     expect(await fundraiser.name()).to.equal(name);
     expect(await fundraiser.url()).to.equal(url);
     expect(await fundraiser.imageURL()).to.equal(imageURL);
     expect(await fundraiser.description()).to.equal(description);
     expect(await fundraiser.beneficiary()).to.equal(beneficiary);
-    expect(await fundraiser.custodian()).to.equal(custodian);
+    expect(await fundraiser.owner()).to.equal(owner);
   });
 });
