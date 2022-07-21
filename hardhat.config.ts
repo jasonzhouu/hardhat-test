@@ -12,6 +12,9 @@ const config: HardhatUserConfig = {
       },
     ],
   },
+  mocha: {
+    parallel: true,
+  },
 };
 
 export default config;

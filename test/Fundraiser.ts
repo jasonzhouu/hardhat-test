@@ -2,15 +2,29 @@ import { ethers } from "hardhat";
 import { ethers as ethers_ } from "ethers";
 import { assert, expect } from "chai";
 
-describe("FundRaiser", () => {
+describe("FundRaiser", async () => {
   let fundraiser: ethers_.Contract;
+  const accounts = await ethers.getSigners();
+  const name = "Beneficiary Name";
+  const url = "beneficiaryname.org";
+  const imageURL = "https://placekitten.com/600/350";
+  const description = "Beneficiary description";
+  const beneficiary = accounts[1].address;
+  const custodian = accounts[0].address;
   beforeEach(async () => {
     const Fundraiser = await ethers.getContractFactory("Fundraiser");
-    fundraiser = await Fundraiser.deploy("Jason", "");
+    fundraiser = await Fundraiser.deploy(
+      name,
+      url,
+      description,
+      imageURL,
+      beneficiary,
+      custodian
+    );
   });
   it("get contract", async () => {
     assert(fundraiser, "contract was not found");
     const actual = await fundraiser.name();
-    expect(actual).to.equal("Jason");
+    expect(actual).to.equal(name);
   });
 });
