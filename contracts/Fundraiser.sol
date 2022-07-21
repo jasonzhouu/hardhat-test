@@ -29,4 +29,9 @@ contract Fundraiser is Ownable {
     function setBeneficiary(address payable _beneficiary) public onlyOwner {
         beneficiary = _beneficiary;
     }
+
+    function donate() public payable returns (bool) {
+        beneficiary.transfer(msg.value);
+        return true;
+    }
 }
