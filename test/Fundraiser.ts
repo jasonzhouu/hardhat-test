@@ -3,7 +3,7 @@ import { ethers } from "hardhat";
 import { ethers as ethers_ } from "ethers";
 import { assert, expect } from "chai";
 
-describe("FundRaiser", async () => {
+describe("FundRaiser", () => {
   async function deployFixture() {
     let fundraiser: ethers_.Contract;
     const accounts = await ethers.getSigners();
@@ -23,6 +23,7 @@ describe("FundRaiser", async () => {
       owner
     );
     return {
+      accounts,
       name,
       url,
       imageURL,
@@ -43,5 +44,18 @@ describe("FundRaiser", async () => {
     expect(await fundraiser.description()).to.equal(description);
     expect(await fundraiser.beneficiary()).to.equal(beneficiary);
     expect(await fundraiser.owner()).to.equal(owner);
+  });
+  describe("set beneficiary", () => {
+    it("update beneficiary when called by owner account", async () => {
+      const { fundraiser, accounts } = await loadFixture(deployFixture);
+      await expect(fundraiser.setBeneficiary(accounts[2].address)).not.to.be
+        .reverted;
+    });
+    it("throw an error when called by non-owner account", async () => {
+      const { fundraiser, accounts } = await loadFixture(deployFixture);
+      await expect(
+        fundraiser.connect(accounts[3]).setBeneficiary(accounts[2].address)
+      ).to.be.reverted;
+    });
   });
 });

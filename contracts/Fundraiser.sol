@@ -25,4 +25,8 @@ contract Fundraiser is Ownable {
         beneficiary = _beneficiary;
         _transferOwnership(_custodian);
     }
+
+    function setBeneficiary(address payable _beneficiary) public onlyOwner {
+        beneficiary = _beneficiary;
+    }
 }
