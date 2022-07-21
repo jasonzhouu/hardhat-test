@@ -17,8 +17,8 @@ describe("FundRaiser", async () => {
     fundraiser = await Fundraiser.deploy(
       name,
       url,
-      description,
       imageURL,
+      description,
       beneficiary,
       custodian
     );
@@ -34,9 +34,21 @@ describe("FundRaiser", async () => {
   }
 
   it("get contract", async () => {
-    const { name, fundraiser } = await loadFixture(deployFixture);
+    const {
+      name,
+      url,
+      imageURL,
+      description,
+      beneficiary,
+      custodian,
+      fundraiser,
+    } = await loadFixture(deployFixture);
     assert(fundraiser, "contract was not found");
-    const actual = await fundraiser.name();
-    expect(actual).to.equal(name);
+    expect(await fundraiser.name()).to.equal(name);
+    expect(await fundraiser.url()).to.equal(url);
+    expect(await fundraiser.imageURL()).to.equal(imageURL);
+    expect(await fundraiser.description()).to.equal(description);
+    expect(await fundraiser.beneficiary()).to.equal(beneficiary);
+    expect(await fundraiser.custodian()).to.equal(custodian);
   });
 });
