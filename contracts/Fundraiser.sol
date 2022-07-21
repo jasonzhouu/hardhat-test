@@ -39,10 +39,12 @@ contract Fundraiser is Ownable {
         beneficiary = _beneficiary;
     }
 
-    function donate() public payable returns (bool) {
-        _donations[msg.sender].push(
-            Donation({amount: msg.value, date: block.timestamp})
-        );
+    function donate() public payable {
+        Donation memory donation = Donation({
+            amount: msg.value,
+            date: block.timestamp
+        });
+        _donations[msg.sender].push(donation);
         // donations.push(
         //     Donation({
         //         amount: msg.value,
@@ -52,7 +54,6 @@ contract Fundraiser is Ownable {
         // );
         beneficiary.transfer(msg.value);
         emit LogNewDonation(msg.sender, msg.value);
-        return true;
     }
 
     function myDonationsCount() public view returns (uint) {

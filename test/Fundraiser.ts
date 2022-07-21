@@ -69,16 +69,11 @@ describe("FundRaiser", () => {
       const newDonationsCount = await fundraiser_.myDonationsCount();
       expect(newDonationsCount - currentDonationsCount).to.equal(1);
     });
+    it("donate event", async () => {
+      const { fundraiser, accounts } = await loadFixture(deployFixture);
+      await expect(fundraiser.connect(accounts[2]).donate({ value: 1 }))
+        .to.emit(fundraiser, "LogNewDonation")
+        .withArgs(accounts[2].address, 1);
+    });
   });
-  // it("donate", async () => {
-  //   const { fundraiser, accounts } = await loadFixture(deployFixture);
-  //   await expect(fundraiser.connect(accounts[2]).donate({ value: 1 })).not.to.be
-  //     .reverted;
-  // });
-  // it("donate event", async () => {
-  //   const { fundraiser, accounts } = await loadFixture(deployFixture);
-  //   await expect(fundraiser.connect(accounts[2]).donate({ value: 1 }))
-  //     .to.emit(fundraiser, "LogNewDonation")
-  //     .withArgs(accounts[2].address, 1);
-  // });
 });
