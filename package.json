@@ -10,6 +10,7 @@
     "hardhat": "^2.10.0"
   },
   "dependencies": {
-    "openzeppelin-solidity": "^4.6.0"
+    "openzeppelin-solidity": "^4.6.0",
+    "web3": "^1.7.4"
   }
 }
