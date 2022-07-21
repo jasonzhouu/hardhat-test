@@ -63,4 +63,10 @@ describe("FundRaiser", () => {
     await expect(fundraiser.connect(accounts[2]).donate({ value: 1 })).not.to.be
       .reverted;
   });
+  it("donate event", async () => {
+    const { fundraiser, accounts } = await loadFixture(deployFixture);
+    await expect(fundraiser.connect(accounts[2]).donate({ value: 1 }))
+      .to.emit(fundraiser, "LogNewDonation")
+      .withArgs(accounts[2].address, 1);
+  });
 });

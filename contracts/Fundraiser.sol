@@ -10,6 +10,15 @@ contract Fundraiser is Ownable {
 
     address payable public beneficiary;
 
+    Donation[] public donations;
+
+    struct Donation {
+        address contributor;
+        uint amount;
+    }
+
+    event LogNewDonation(address contributor, uint amount);
+
     constructor(
         string memory _name,
         string memory _url,
@@ -31,7 +40,9 @@ contract Fundraiser is Ownable {
     }
 
     function donate() public payable returns (bool) {
+        donations.push(Donation({amount: msg.value, contributor: msg.sender}));
         beneficiary.transfer(msg.value);
+        emit LogNewDonation(msg.sender, msg.value);
         return true;
     }
 }
